@@ -1,11 +1,5 @@
-import Data.List.Split ( splitOneOf, splitOn, splitEvery, chunksOf )
-import Data.Char (digitToInt, isDigit, isAlpha)
-import Data.ByteString (find)
-import Data.List(inits, sort, sortBy, transpose, group, delete)
-import Text.Printf (errorBadArgument)
-import Data.List.NonEmpty (groupWith)
-import Data.Maybe (isNothing, isJust)
-
+import Data.List (sortBy, group, sort)
+import Data.List.Split (chunksOf)
 part1 :: IO()
 part1 = do
   contents <- readFile "input.txt"
@@ -29,7 +23,7 @@ parseInput input = map (convertToHandAndBid . words) $ lines input
   where 
     convertToHandAndBid :: [String] -> ([Int], Int)
     convertToHandAndBid [h,b] = (map getVal $ chunksOf 1 h, read b)
-    convertToHandAndBid _ = errorBadArgument
+    convertToHandAndBid _ = error "empty hand"
     getVal :: String -> Int
     getVal s = case s of
                 "T" -> 10
@@ -47,7 +41,7 @@ parseInput2 input = map (convertToHandAndBid . words) $ lines input
   where 
     convertToHandAndBid :: [String] -> ([Int], Int)
     convertToHandAndBid [h,b] = (map getVal $ chunksOf 1 h, read b)
-    convertToHandAndBid _ = errorBadArgument
+    convertToHandAndBid _ = error "empty hand"
     getVal :: String -> Int
     getVal s = case s of
                 "T" -> 10
@@ -78,7 +72,7 @@ testHand3 :: [Int]
 testHand3 = [2,2,3,3,11]
 
 getType :: [Int] -> Int
-getType [] = errorBadArgument
+getType [] = error "empty hand"
 getType hand | length groupedHand == 1 = 7
              | length groupedHand == 2 && (checkLengths [1,4] groupedHand) = 6
              | length groupedHand == 2 && (checkLengths [2,3] groupedHand) = 5
@@ -86,7 +80,7 @@ getType hand | length groupedHand == 1 = 7
              | length groupedHand == 3 && (checkLengths [1,2,2] groupedHand) = 3
              | length groupedHand == 4 = 2
              | length groupedHand == 5 = 1
-             | otherwise = errorBadArgument
+             | otherwise = error "invalid hand"
   where groupedHand = sortBy (\a b -> compare (length a) (length b)) $ group $ sort hand
         firstGroup = head groupedHand
 
@@ -94,7 +88,7 @@ checkLengths :: [Int] -> [[Int]] -> Bool
 checkLengths list hand = and $ map (\(a, b) -> length b == a) $ zip list hand
 
 getType2 :: [Int] -> Int
-getType2 [] = errorBadArgument
+getType2 [] = error "invalid hand"
 getType2 hand | length groupedHand == 1 = 7
              | length groupedHand == 2 && (checkLengths [1,4] groupedHand) = 6
              | length groupedHand == 2 && (checkLengths [2,3] groupedHand) = 5
@@ -102,7 +96,7 @@ getType2 hand | length groupedHand == 1 = 7
              | length groupedHand == 3 && (checkLengths [1,2,2] groupedHand) = 3
              | length groupedHand == 4 = 2
              | length groupedHand == 5 = 1
-             | otherwise = error (show groupedHand)
+             | otherwise = error "invalid hand"
   where groupedHand = moveJokers (sortBy (\a b -> compare (length a) (length b)) $ group $ sort hand)
 
 moveJokers :: [[Int]] -> [[Int]]
